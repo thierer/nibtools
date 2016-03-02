@@ -74,6 +74,7 @@ extern char *cbm_adapter;
 extern BYTE density_map;
 extern BYTE skew_map[];
 extern BYTE fillbyte;
+extern BYTE copyprot;
 extern BYTE drive;
 extern FILE * fplog;
 extern float motor_speed;

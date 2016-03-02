@@ -25,6 +25,8 @@
 #include "prot.h"
 #include "crc.h"
 
+extern BYTE copyprot;
+
 BYTE sector_map[MAX_TRACKS_1541 + 1] = {
 	0,
 	21, 21, 21, 21, 21, 21, 21, 21, 21, 21,	/*  1 - 10 */
@@ -429,7 +431,10 @@ convert_sector_to_GCR(BYTE * buffer, BYTE * ptr, int track, int sector, BYTE * d
 		}
 
 		buf[0] = 0x08;	/* Header identifier */
-		buf[1] = (BYTE) (sector ^ track ^ tempID[1] ^ tempID[0]);
+		if (copyprot == 128)
+		   buf[1] = (BYTE) (sector ^ track ^ 0x0f);
+		else
+		   buf[1] = (BYTE) (sector ^ track ^ tempID[1] ^ tempID[0]);
 		buf[2] = (BYTE) sector;
 		buf[3] = (BYTE) track;
 
@@ -438,13 +443,42 @@ convert_sector_to_GCR(BYTE * buffer, BYTE * ptr, int track, int sector, BYTE * d
 
 		convert_4bytes_to_GCR(buf, ptr);
 		ptr += 5;
-		buf[0] = tempID[1];
-		buf[1] = tempID[0];
-		buf[2] = buf[3] = 0x0f;
+		if (copyprot == 128)
+		{
+		   buf[0] = 0x48;
+		   buf[1] = 0x47;
+		   buf[2] = buf[3] = 0x00;
+		}
+		else
+		{
+		   buf[0] = tempID[1];
+		   buf[1] = tempID[0];
+		   buf[2] = buf[3] = 0x0f;
+		}
 		convert_4bytes_to_GCR(buf, ptr);
 		ptr += 5;
-		memset(ptr, 0x55, HEADER_GAP_LENGTH);	/* Header Gap */
-		ptr += HEADER_GAP_LENGTH;
+
+		if (copyprot == 1)
+		{
+		    memset(ptr, 0x55, HEADER_GAP_LENGTH-4);	/* Header Gap */
+		    ptr += HEADER_GAP_LENGTH - 4;
+		    memset(ptr, 0x67, 1);
+			ptr++;
+		    memset(ptr, 0x55, 2);
+			ptr += 2;
+		    memset(ptr, 0x67, 1);
+			ptr++;
+		}
+		else if (copyprot == 128)
+		{
+		    memcpy(ptr, "\x52\x94\xa5\x29\x4a\x52\x94\xa5\x2b", 9);
+			ptr += 9;
+		}
+		else
+		{
+		    memset(ptr, 0x55, HEADER_GAP_LENGTH);	/* Header Gap */
+		    ptr += HEADER_GAP_LENGTH;
+	    }
 	}
 
 	if (error == DATA_NOT_FOUND)
@@ -474,8 +508,27 @@ convert_sector_to_GCR(BYTE * buffer, BYTE * ptr, int track, int sector, BYTE * d
 		ptr += 5;
 	}
 
-	memset(ptr, 0x55, SECTOR_GAP_LENGTH);	 /* tail gap*/
-	ptr += SECTOR_GAP_LENGTH;
+    if (copyprot == 1)
+	{
+		    memset(ptr, 0x55, SECTOR_GAP_LENGTH-4);	/* Header Gap */
+		    ptr += SECTOR_GAP_LENGTH - 4;
+		    memset(ptr, 0x67, 1);
+			ptr++;
+		    memset(ptr, 0x55, 2);
+			ptr += 2;
+		    memset(ptr, 0x67, 1);
+			ptr++;
+	}
+	else if (copyprot == 128 && track == 18)
+	{
+	    memset(ptr, 0x11, 22);	 /* tail gap*/
+	    ptr += 22;
+	}
+	else
+	{
+	    memset(ptr, 0x55, SECTOR_GAP_LENGTH);	 /* tail gap*/
+	    ptr += SECTOR_GAP_LENGTH;
+	}
 }
 
 size_t

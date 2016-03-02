@@ -335,6 +335,17 @@ void parseargs(char *argv[])
 			printf("* Ignore 'killer' tracks\n");
 			break;
 
+		case '7':
+			copyprot = 1;
+			break;
+
+		case '8':
+			if ((*argv)[2] == '1')
+			   copyprot = 128;
+			else
+			   usage();
+		    break;
+
 		default:
 			usage();
 			break;
@@ -354,6 +365,8 @@ void switchusage(void)
  	" -0: Enable bad GCR run reduction\n"
  	" -r: Disable automatic sync reduction\n"
 	" -f: Disable automatic bad GCR simulation\n"
+	" -7: Use GEOS tail gaps\n"
+	" -81: Use Timex V1 copy protection on track 18\n"
 	" -v: Verbose (output more detailed info)\n");
 }
 
@@ -703,6 +716,7 @@ int read_d64(char *filename, BYTE *track_buffer, BYTE *track_density, size_t *tr
 	sector_ref = 0;
 	for (track = 1; track <= last_track; track++)
 	{
+        int more = copyprot == 128 && track == 18 ? 14 : 0;
 		// clear buffers
 		memset(gcrdata, 0x55, sizeof(gcrdata));
 		errorstring[0] = '\0';
@@ -725,12 +739,12 @@ int read_d64(char *filename, BYTE *track_buffer, BYTE *track_density, size_t *tr
 				memset(buffer, fillbyte, sizeof(buffer));
 
 			// convert to gcr
-			convert_sector_to_GCR(buffer, gcrdata + (sector * SECTOR_SIZE), track, sector, id, error);
+			convert_sector_to_GCR(buffer, gcrdata + (sector * (SECTOR_SIZE+more)), track, sector, id, error);
 			cur_sector++;
 		}
 
 		// calculate track length
-		track_length[track*2] = sector_map[track] * SECTOR_SIZE;
+		track_length[track*2] = sector_map[track] * (SECTOR_SIZE+more);
 
 		// no half tracks in D64, so clear them
 		track_length[(track*2)+1] = 0;
