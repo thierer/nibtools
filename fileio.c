@@ -385,6 +385,7 @@ void switchusage(void)
 	" -1.2a: Use GEOS 1.2 copy protection on Track 36 (Variation a)\n"
 	" -1.2b: Use GEOS 1.2 copy protection on Track 36 (Variation b)\n"
 	" -1.2c: Use GEOS 1.2 copy protection on Track 36 (Variation c)\n"
+	" -81    Use timex v1 copy protection on track 18\n"
 	" -v: Verbose (output more detailed info)\n");
 }
 
@@ -493,7 +494,7 @@ int read_nb2(char *filename, BYTE *track_buffer, BYTE *track_density, size_t *tr
 	fseek(fpin, sizeof(header) + (17 * 2 * NIB_TRACK_LENGTH * 16) + (8 * NIB_TRACK_LENGTH), SEEK_SET);
 	fread(tmpdata, NIB_TRACK_LENGTH, 1, fpin);
 
-	if (!extract_id(tmpdata, diskid))
+	if (!extract_id(tmpdata, diskid, track_length[18*2]))
 	{
 			fprintf(stderr, "Cannot find directory sector.\n");
 			return 0;
@@ -905,12 +906,12 @@ int write_d64(char *filename, BYTE *track_buffer, BYTE *track_density, size_t *t
 	}
 
 	/* get disk id */
-	if (!extract_id(track_buffer + (18*2*NIB_TRACK_LENGTH), id))
+	if (!extract_id(track_buffer + (18*2*NIB_TRACK_LENGTH), id, track_length[18*2]))
 	{
 		int track = id[0];
 		//printf("debug: dir track really=%d\n",track);
 		offset = 18 - track;
-		if (!offset || !extract_id(track_buffer + ((18+offset)*2*NIB_TRACK_LENGTH), id))
+		if (!offset || !extract_id(track_buffer + ((18+offset)*2*NIB_TRACK_LENGTH), id, track_length[(18+offset)*2]))
 		{
 			fprintf(stderr, "Cannot find directory sector.\n");
 			return 0;
@@ -1428,7 +1429,7 @@ unsigned int crc_dir_track(BYTE *track_buffer, size_t *track_length)
 	crcInit();
 
 	/* get disk id */
-	if (!extract_id(track_buffer + (18 * 2 * NIB_TRACK_LENGTH), id))
+	if (!extract_id(track_buffer + (18 * 2 * NIB_TRACK_LENGTH), id, track_length[18*2]))
 	{
 		fprintf(stderr, "Cannot find directory sector.\n");
 		return 0;
@@ -1471,7 +1472,7 @@ unsigned int crc_all_tracks(BYTE *track_buffer, size_t *track_length)
 	crcInit();
 
 	/* get disk id */
-	if (!extract_id(track_buffer + (18*2 * NIB_TRACK_LENGTH), id))
+	if (!extract_id(track_buffer + (18*2 * NIB_TRACK_LENGTH), id, track_length[18*2]))
 	{
 		fprintf(stderr, "Cannot find directory sector.\n");
 		return 0;
@@ -1517,7 +1518,7 @@ unsigned int md5_dir_track(BYTE *track_buffer, size_t *track_length, unsigned ch
 	memset(data, 0, sizeof(data));
 
 	/* get disk id */
-	if (!extract_id(track_buffer + (18*2 * NIB_TRACK_LENGTH), id))
+	if (!extract_id(track_buffer + (18*2 * NIB_TRACK_LENGTH), id, track_length[18*2]))
 	{
 		fprintf(stderr, "Cannot find directory sector.\n");
 		return 0;
@@ -1557,7 +1558,7 @@ unsigned int md5_all_tracks(BYTE *track_buffer, size_t *track_length, unsigned c
 	memset(data, 0, sizeof(data));
 
 	/* get disk id */
-	if (!extract_id(track_buffer + (18*2 * NIB_TRACK_LENGTH), id))
+	if (!extract_id(track_buffer + (18*2 * NIB_TRACK_LENGTH), id, track_length[18*2]))
 	{
 		fprintf(stderr, "Cannot find directory sector.\n");
 		return 0;
