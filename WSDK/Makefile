@@ -372,7 +372,9 @@ $(C_DIR)\DriveCode:
 #   Build "bin2array.exe" utility
     $(cc) $(cdebug) $(cflags) $(cvarsdll) /wd4996 /Fo"$(OUTDIR)/" /Fd"$(OUTDIR)\bin2array.pdb" bin2array.c
     $(link) $(ldebug) $(conlflags) $(conlibsdll) -out:"$(OUTDIR)\bin2array.exe" "$(OUTDIR)\bin2array.obj"
+!IF EXIST ($(OUTDIR)\bin2array.exe.manifest)
     mt.exe -manifest "$(OUTDIR)\bin2array.exe.manifest" -outputresource:"$(OUTDIR)\bin2array.exe";1
+!ENDIF
 
 #   Convert 1541/1571 drive code binaries to C include files
     $(B2A_DIR)\bin2array "$(OUTDIR)\nibtools_1541.bin" "$(C_DIR)\nibtools_1541.inc"
