@@ -25,7 +25,7 @@
 #include "prot.h"
 #include "crc.h"
 
-extern BYTE copyprot;
+BYTE copyprot = 0;
 
 BYTE sector_map[MAX_TRACKS_1541 + 1] = {
 	0,
