@@ -164,7 +164,7 @@ int repair(void)
 	printf("\nScanning for errors...\n");
 
 	/* get disk id */
-	if (!extract_id(track_buffer + (18 * 2 * NIB_TRACK_LENGTH), id))
+	if (!extract_id(track_buffer + (18 * 2 * NIB_TRACK_LENGTH), id, NIB_TRACK_LENGTH))
 	{
 		fprintf(stderr, "Cannot find directory sector.\n");
 		return 0;

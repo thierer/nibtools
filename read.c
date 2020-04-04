@@ -468,7 +468,7 @@ void get_disk_id(CBM_FILE fd)
 		memset(diskid, 0, sizeof(diskid));
 		printf("Format Disk ID: ");
 
-		if (!extract_id(buffer, diskid))
+		if (!extract_id(buffer, diskid, NIB_TRACK_LENGTH))
 			fprintf(stderr, "[Cannot find directory sector!]\n");
 		else
 		{

@@ -313,9 +313,9 @@ compare_disks(void)
 
 	// extract disk id's from track 18
 	memset(id, 0, 3);
-	extract_id(track_buffer + (36 * NIB_TRACK_LENGTH), id);
+	extract_id(track_buffer + (36 * NIB_TRACK_LENGTH), id, NIB_TRACK_LENGTH);
 	memset(id2, 0, 3);
-	extract_id(track_buffer2 + (36 * NIB_TRACK_LENGTH), id2);
+	extract_id(track_buffer2 + (36 * NIB_TRACK_LENGTH), id2, NIB_TRACK_LENGTH);
 
 	memset(cid, 0, 3);
 	extract_cosmetic_id(track_buffer + (36 * NIB_TRACK_LENGTH), cid);
@@ -488,7 +488,7 @@ scandisk(void)
 
 	// extract disk id from track 18
 	memset(id, 0, 3);
-	extract_id(track_buffer + (36 * NIB_TRACK_LENGTH), id);
+	extract_id(track_buffer + (36 * NIB_TRACK_LENGTH), id, NIB_TRACK_LENGTH);
 	printf("\ndisk id: %s\n", id);
 
 	// collect and print "cosmetic" disk id for comparison
