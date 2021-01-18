@@ -114,18 +114,23 @@ _wts_start:
         JMP  _wts_write
 
 _wts_L1:
-        BIT  CIA_ICR              ; check for SRQ byte-ready
-        BMI  _wts_write
+        NOP                       ; timing
+        NOP
+        NOP
 _wts_L2:
-        BIT  CIA_ICR              ; check for SRQ byte-ready
-        BMI  _wts_write
+        NOP                       ; timing
+        NOP
+        NOP
 _wts_L3:
-        BIT  CIA_ICR              ; check for SRQ byte-ready
-        BMI  _wts_write
-        BIT  CIA_ICR              ; check for SRQ byte-ready
-        BMI  _wts_write
-        BIT  CIA_ICR              ; check for SRQ byte-ready
-        BMI  _wts_write
+        NOP                       ; timing
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
         BIT  CIA_ICR              ; check for SRQ byte-ready
         BPL  _wts_exit            ; branch to exit
 
